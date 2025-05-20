@@ -1,15 +1,15 @@
 #include <SPI.h>
 #include <Ethernet.h>
-#include <HttpClient.h>
+
 #define relayPin 9
 
 // MAC and IP for entry_gate1
-//byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0x01};
-//IPAddress ip(192, 168, 1, 157);
+byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0x01};
+IPAddress ip(192, 168, 1, 157);
 
 // For entry_gate2
-byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0x02};
-IPAddress ip(192, 168, 1, 158);
+// byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0x02};
+// IPAddress ip(192, 168, 1, 158);
 
 // For exit_gate1
 // byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0x03};
@@ -19,17 +19,17 @@ IPAddress ip(192, 168, 1, 158);
 // byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0x04};
 // IPAddress ip(192, 168, 1, 160);
 
-IPAddress server(192, 168, 1, 50);
+IPAddress server(192, 168, 1, 100);
 EthernetClient client;
 HttpClient http(client, server, 5000);
 
-//const char* gateID = "entry_gate1";
-const char* gateID = "entry_gate2";
+const char* gateID = "entry_gate1";
+// const char* gateID = "entry_gate2";
 // const char* gateID = "exit_gate1";
 // const char* gateID = "exit_gate2";
 
 unsigned long lastRequestTime = 0;
-const unsigned long requestInterval = 2000;
+const unsigned long requestInterval = 3000;
 
 void setup() {
   Serial.begin(9600);
@@ -60,6 +60,11 @@ void checkBoomSignal() {
   int statusCode = http.responseStatusCode();
   String response = http.responseBody();
 
+  Serial.print("Response Code: ");
+  Serial.println(statusCode);
+  Serial.print("Response Body: ");
+  Serial.println(response);
+
   if (statusCode == 200 && response.indexOf("|OPENEN%") >= 0) {
     triggerBarrier();
   }
@@ -68,8 +73,9 @@ void checkBoomSignal() {
 
 void triggerBarrier() {
   Serial.println("Barrier is opening...");
-  digitalWrite(relayPin, LOW);
+  digitalWrite(relayPin, LOW);  // Activate relay (assuming LOW is ON)
   delay(500);
-  digitalWrite(relayPin, HIGH);
+  digitalWrite(relayPin, HIGH); // Deactivate relay
   delay(500);
 }
+
