@@ -2,29 +2,24 @@
 #include <SPI.h>
 #include <Ethernet.h>
 
-// MAC and IP for entry_gate1
+//car entry entry_gate1
 byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0x01};
-IPAddress ip(192, 168, 1, 157);
+IPAddress ip(192, 168, 3, 15);
 
-// For entry_gate2
-// byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0x02};
-// IPAddress ip(192, 168, 1, 158);
+// bike entry For entry_gate2
+//byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0x02};
+//IPAddress ip(192, 168, 3, 16);
 
-// For exit_gate1
-// byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0x03};
-// IPAddress ip(192, 168, 1, 159);
+// car exit For exit_gate1
+//byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0x03};
+//IPAddress ip(192, 168, 3, 17);
 
-// For exit_gate2
+// bike exit  exit_gate2
 // byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0x04};
-// IPAddress ip(192, 168, 1, 160);
+// IPAddress ip(192, 168, 3, 18);
 
-IPAddress serverIp(192, 168, 1, 50); // IP where Flask runs
+IPAddress serverIp(192, 168, 3, 100);
 EthernetClient client;
-
-//const char* gateID = "entry_gate1";
-// const char* gateID = "entry_gate2";
-// const char* gateID = "exit_gate1";
-// const char* gateID = "exit_gate2";
 
 const int relayPin = 9;
 
@@ -32,13 +27,13 @@ void setup() {
   Ethernet.begin(mac, ip);
   Serial.begin(9600);
   pinMode(relayPin, OUTPUT);
-  digitalWrite(relayPin, HIGH);  // Relay off (active LOW)
+  digitalWrite(relayPin, HIGH);
 }
 
 void loop() {
-  if (client.connect(serverIp, 5000)) { // Flask running on port 8000
-    client.println("GET /check_boomsig?gate_id=entry_gate1 HTTP/1.1");
-    client.println("Host: 192.168.1.100");
+  if (client.connect(serverIp, 5000)) {
+    client.println("GET /check_boomsig?gate_id=entry_gate2 HTTP/1.1");
+    client.println("Host: 192.168.3.142");
     client.println("Connection: close");
     client.println();
 
@@ -61,6 +56,7 @@ void loop() {
   }
   delay(5000);
 }
+
 
 //Ex-2 this is the deployed code and it is working but the problem is the server should be start first then the arduino client will be connected. but when power fails then it will not send the data to the server
 #include <Ethernet.h>
