@@ -59,8 +59,9 @@ void loop() {
 
 
 //Ex-2 this is the deployed code and it is working but the problem is the server should be start first then the arduino client will be connected. but when power fails then it will not send the data to the server
+#include <SPI.h>
 #include <Ethernet.h>
-
+#include <ArduinoHttpClient.h>
 #define relayPin 9
 
 // MAC and IP for entry_gate1
@@ -136,6 +137,76 @@ void triggerBarrier() {
   digitalWrite(relayPin, LOW);  // Activate relay (assuming LOW is ON)
   delay(500);
   digitalWrite(relayPin, HIGH); // Deactivate relay
+  delay(500);
+}
+
+//EX-3 i want to remove the polling the request 
+#include <SPI.h>
+#include <Ethernet.h>
+#include <WebSocketsClient.h>
+
+#define relayPin 9
+
+byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0x01};
+IPAddress ip(192, 168, 1, 157);
+
+const char* websocket_host = "192.168.1.100";
+const uint16_t websocket_port = 5000;
+const char* gateID = "entry_gate1";
+
+EthernetClient ethClient;
+WebSocketsClient webSocket;
+
+void setup() {
+  Serial.begin(9600);
+  while (!Serial) { ; }
+
+  Ethernet.begin(mac, ip);
+  delay(1000);
+
+  Serial.print("Local IP: ");
+  Serial.println(Ethernet.localIP());
+
+  pinMode(relayPin, OUTPUT);
+  digitalWrite(relayPin, HIGH);
+
+  webSocket.begin(websocket_host, websocket_port, "/ws/" + String(gateID));
+  webSocket.onEvent(webSocketEvent);
+  webSocket.setReconnectInterval(5000);
+}
+
+void loop() {
+  webSocket.loop();
+}
+
+void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
+  switch (type) {
+    case WStype_CONNECTED:
+      Serial.println("Connected to WebSocket server");
+      break;
+
+    case WStype_DISCONNECTED:
+      Serial.println("Disconnected from WebSocket server");
+      break;
+
+    case WStype_TEXT:
+      Serial.print("Message received: ");
+      Serial.println((char*)payload);
+      if (String((char*)payload).indexOf("|OPENEN%") >= 0) {
+        triggerBarrier();
+      }
+      break;
+
+    default:
+      break;
+  }
+}
+
+void triggerBarrier() {
+  Serial.println("Barrier is opening...");
+  digitalWrite(relayPin, LOW);
+  delay(500);
+  digitalWrite(relayPin, HIGH);
   delay(500);
 }
 
