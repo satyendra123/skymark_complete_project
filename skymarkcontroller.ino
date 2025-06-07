@@ -4,21 +4,21 @@
 
 //car entry entry_gate1
 byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0x01};
-IPAddress ip(192, 168, 3, 15);
+IPAddress ip(192, 168, 3, 16);
 
 // bike entry For entry_gate2
 //byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0x02};
-//IPAddress ip(192, 168, 3, 16);
+//IPAddress ip(192, 168, 3, 15);
 
 // car exit For exit_gate1
 //byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0x03};
 //IPAddress ip(192, 168, 3, 17);
 
 // bike exit  exit_gate2
-// byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0x04};
-// IPAddress ip(192, 168, 3, 18);
+//byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0x04};
+//IPAddress ip(192, 168, 3, 18);
 
-IPAddress serverIp(192, 168, 3, 100);
+IPAddress serverIp(192, 168, 3, 36);
 EthernetClient client;
 
 const int relayPin = 9;
@@ -33,7 +33,7 @@ void setup() {
 void loop() {
   if (client.connect(serverIp, 5000)) {
     client.println("GET /check_boomsig?gate_id=entry_gate2 HTTP/1.1");
-    client.println("Host: 192.168.3.142");
+    client.println("Host: 192.168.3.36");
     client.println("Connection: close");
     client.println();
 
@@ -56,6 +56,7 @@ void loop() {
   }
   delay(5000);
 }
+
 
 
 //Ex-2 this is the deployed code and it is working but the problem is the server should be start first then the arduino client will be connected. but when power fails then it will not send the data to the server
